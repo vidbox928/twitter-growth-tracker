@@ -1,0 +1,87 @@
+{
+  "current": {
+    "date": "2026-01-31",
+    "followers": 42,
+    "following": 15,
+    "tweets_count": 8
+  },
+  "history": [
+    {
+      "date": "2026-01-25",
+      "followers": 28,
+      "following": 12,
+      "tweets_count": 3
+    },
+    {
+      "date": "2026-01-26",
+      "followers": 31,
+      "following": 13,
+      "tweets_count": 4
+    },
+    {
+      "date": "2026-01-27",
+      "followers": 33,
+      "following": 14,
+      "tweets_count": 5
+    },
+    {
+      "date": "2026-01-28",
+      "followers": 36,
+      "following": 14,
+      "tweets_count": 6
+    },
+    {
+      "date": "2026-01-29",
+      "followers": 38,
+      "following": 15,
+      "tweets_count": 7
+    },
+    {
+      "date": "2026-01-30",
+      "followers": 40,
+      "following": 15,
+      "tweets_count": 7
+    },
+    {
+      "date": "2026-01-31",
+      "followers": 42,
+      "following": 15,
+      "tweets_count": 8
+    }
+  ],
+  "recent_tweets": [
+    {
+      "id": "1863429770924691456",
+      "created_at": "2026-01-31T10:30:00",
+      "text": "Building OpenPasskey - the card scheme for crypto. Payments are the main bus. 🏗️ #Base #CryptoPayments",
+      "likes": 12,
+      "retweets": 3,
+      "replies": 2
+    },
+    {
+      "id": "1863429770924691457",
+      "created_at": "2026-01-30T15:20:00",
+      "text": "Loyalty first, payments next. That's how you win merchants. Not cheaper fees - better value distribution. 💡",
+      "likes": 18,
+      "retweets": 5,
+      "replies": 4
+    },
+    {
+      "id": "1863429770924691458",
+      "created_at": "2026-01-29T09:15:00",
+      "text": "9 cafés live in Sydney. ~900 consumers. ~9,000 transactions. This is just the beginning. 🚀 #BuildInPublic",
+      "likes": 24,
+      "retweets": 7,
+      "replies": 6
+    },
+    {
+      "id": "1863429770924691459",
+      "created_at": "2026-01-28T14:45:00",
+      "text": "The tap moment is distribution. Every payment = discovery + loyalty + data. Visa can't compete with that. 💳➡️🔗",
+      "likes": 15,
+      "retweets": 4,
+      "replies": 3
+    }
+  ],
+  "updated_at": "2026-01-31T15:00:00"
+}
