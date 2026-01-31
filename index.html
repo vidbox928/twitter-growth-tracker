@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Growth Tracker - @opkceo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">@opkceo Growth Tracker</h1>
+                    <p class="text-gray-600 mt-1">Building OpenPasskey in public</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">Last updated</p>
+                    <p class="text-lg font-semibold" id="lastUpdate">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- Followers -->
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Followers</p>
+                        <p class="text-3xl font-bold text-blue-600" id="followers">-</p>
+                        <p class="text-sm mt-1" id="followersChange">
+                            <span class="text-green-600">+0 today</span>
+                        </p>
+                    </div>
+                    <div class="text-blue-500 text-4xl">👥</div>
+                </div>
+            </div>
+
+            <!-- Following -->
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Following</p>
+                        <p class="text-3xl font-bold text-purple-600" id="following">-</p>
+                        <p class="text-sm mt-1 text-gray-500">Ratio: <span id="ratio">-</span></p>
+                    </div>
+                    <div class="text-purple-500 text-4xl">🔗</div>
+                </div>
+            </div>
+
+            <!-- Tweets -->
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Tweets</p>
+                        <p class="text-3xl font-bold text-green-600" id="tweets">-</p>
+                        <p class="text-sm mt-1 text-gray-500">Engagement: <span id="engagement">-</span></p>
+                    </div>
+                    <div class="text-green-500 text-4xl">🐦</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Growth Chart -->
+        <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">30-Day Growth Trend</h2>
+            <canvas id="growthChart" height="80"></canvas>
+        </div>
+
+        <!-- Recent Tweets Performance -->
+        <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Recent Tweets Performance</h2>
+            <div id="recentTweets" class="space-y-4">
+                <p class="text-gray-500 text-center py-8">Loading tweets...</p>
+            </div>
+        </div>
+
+        <!-- Quick Tweet Composer -->
+        <div class="bg-white rounded-lg shadow-xl p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Quick Tweet 🚀</h2>
+            <textarea 
+                id="tweetText" 
+                class="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                rows="4"
+                maxlength="280"
+                placeholder="What's happening? (OpenPasskey updates, crypto payments insights...)"
+            ></textarea>
+            <div class="flex justify-between items-center mt-4">
+                <span class="text-sm text-gray-600"><span id="charCount">0</span>/280</span>
+                <button 
+                    id="sendTweet"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg transition"
+                >
+                    Tweet 🐦
+                </button>
+            </div>
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm font-semibold text-gray-700 mb-2">💡 Hot Topics:</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-blue-200">#Base</span>
+                    <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-purple-200">#CryptoPayments</span>
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-green-200">#Web3Commerce</span>
+                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-yellow-200">#BuildInPublic</span>
+                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-red-200">#OpenPasskey</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load data from SQLite (via API endpoint or embedded JSON)
+        async function loadData() {
+            try {
+                // For now, load from data.json (generated by collect_data.py)
+                const response = await fetch('data.json');
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('followers').textContent = data.current.followers.toLocaleString();
+                document.getElementById('following').textContent = data.current.following.toLocaleString();
+                document.getElementById('tweets').textContent = data.current.tweets_count.toLocaleString();
+                
+                const ratio = (data.current.followers / data.current.following).toFixed(1);
+                document.getElementById('ratio').textContent = ratio;
+                
+                // Calculate change
+                const change = data.current.followers - (data.history[data.history.length - 2]?.followers || 0);
+                const changeEl = document.getElementById('followersChange');
+                if (change > 0) {
+                    changeEl.innerHTML = `<span class="text-green-600">+${change} today</span>`;
+                } else if (change < 0) {
+                    changeEl.innerHTML = `<span class="text-red-600">${change} today</span>`;
+                } else {
+                    changeEl.innerHTML = `<span class="text-gray-600">No change</span>`;
+                }
+                
+                // Update timestamp
+                document.getElementById('lastUpdate').textContent = new Date(data.current.date).toLocaleString();
+                
+                // Draw chart
+                drawChart(data.history);
+                
+                // Show recent tweets
+                showRecentTweets(data.recent_tweets || []);
+                
+            } catch (err) {
+                console.error('Failed to load data:', err);
+                document.getElementById('followers').textContent = 'Error';
+            }
+        }
+        
+        function drawChart(history) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: history.map(d => new Date(d.date).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Followers',
+                        data: history.map(d => d.followers),
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        function showRecentTweets(tweets) {
+            const container = document.getElementById('recentTweets');
+            if (tweets.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">No tweets yet</p>';
+                return;
+            }
+            
+            container.innerHTML = tweets.map(tweet => `
+                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                    <p class="text-gray-800 mb-2">${escapeHtml(tweet.text)}</p>
+                    <div class="flex gap-4 text-sm text-gray-600">
+                        <span>❤️ ${tweet.likes}</span>
+                        <span>🔁 ${tweet.retweets}</span>
+                        <span>💬 ${tweet.replies}</span>
+                        <span class="ml-auto">${new Date(tweet.created_at).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Tweet composer
+        const tweetText = document.getElementById('tweetText');
+        const charCount = document.getElementById('charCount');
+        const sendTweet = document.getElementById('sendTweet');
+        
+        tweetText.addEventListener('input', () => {
+            charCount.textContent = tweetText.value.length;
+        });
+        
+        sendTweet.addEventListener('click', async () => {
+            const text = tweetText.value.trim();
+            if (!text) {
+                alert('Please write something!');
+                return;
+            }
+            
+            if (confirm(`Send this tweet?\n\n${text}`)) {
+                // Call API to send tweet (via bird CLI)
+                try {
+                    const response = await fetch('/api/tweet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text })
+                    });
+                    
+                    if (response.ok) {
+                        alert('Tweet sent! 🎉');
+                        tweetText.value = '';
+                        charCount.textContent = '0';
+                        setTimeout(loadData, 2000); // Reload data
+                    } else {
+                        alert('Failed to send tweet. Check console.');
+                    }
+                } catch (err) {
+                    console.error('Tweet error:', err);
+                    alert('Error sending tweet. See console.');
+                }
+            }
+        });
+        
+        // Hot topic tags
+        document.querySelectorAll('.bg-blue-100, .bg-purple-100, .bg-green-100, .bg-yellow-100, .bg-red-100').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const hashtag = tag.textContent;
+                tweetText.value += ` ${hashtag}`;
+                tweetText.dispatchEvent(new Event('input'));
+                tweetText.focus();
+            });
+        });
+        
+        // Load data on page load
+        loadData();
+        
+        // Refresh every 5 minutes
+        setInterval(loadData, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

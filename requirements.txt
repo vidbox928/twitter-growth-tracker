@@ -1,0 +1,2 @@
+# No Python dependencies required
+# Uses bird CLI (already installed) and built-in sqlite3
